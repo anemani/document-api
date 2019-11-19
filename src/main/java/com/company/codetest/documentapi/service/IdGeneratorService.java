@@ -6,13 +6,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
 @Service
-public class DocumentIdGeneratorService {
+class IdGeneratorService {
 
-    public String generateRandomDocumentId() {
+    String generateRandomDocumentId() {
         return getAlphaNumericString(20);
     }
 
-    static String getAlphaNumericString(int n)
+    private static String getAlphaNumericString(int n)
     {
 
         // length is bounded by 256 Character

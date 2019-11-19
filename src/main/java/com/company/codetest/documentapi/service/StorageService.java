@@ -20,18 +20,18 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @Service
-public class DocumentStorageService {
+public class StorageService {
 
     private final Path documentStorageLocation;
 
     @Autowired
-    private DocumentIdGeneratorService documentIdGeneratorService;
+    private IdGeneratorService idGeneratorService;
 
     @Autowired
     private DocumentMetaDataRepository documentMetaDataRepository;
 
     @Autowired
-    public DocumentStorageService(DocumentStorageProperties documentStorageProperties) {
+    public StorageService(DocumentStorageProperties documentStorageProperties) {
         this.documentStorageLocation = Paths.get(documentStorageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
 
@@ -45,7 +45,7 @@ public class DocumentStorageService {
     public String saveDocument(MultipartFile document) {
 
         //Load new random Id.
-        String newDocumentId = documentIdGeneratorService.generateRandomDocumentId();
+        String newDocumentId = idGeneratorService.generateRandomDocumentId();
 
         // Normalize document name
         String documentName = StringUtils.cleanPath(document.getOriginalFilename());

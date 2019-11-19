@@ -6,8 +6,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
-/*@EntityScan("com.company.codetest.documentapi.domain")
-@EnableJpaRepositories("com.company.codetest.documentapi.repository")*/
 @SpringBootApplication
 public class DocumentApiApplication {
 

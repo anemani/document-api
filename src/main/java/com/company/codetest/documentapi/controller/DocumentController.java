@@ -1,8 +1,8 @@
 package com.company.codetest.documentapi.controller;
 
 
-import com.company.codetest.documentapi.payload.UploadDocumentResponse;
-import com.company.codetest.documentapi.service.DocumentStorageService;
+import com.company.codetest.documentapi.payload.DocumentResponse;
+import com.company.codetest.documentapi.service.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,38 +25,38 @@ public class DocumentController {
     private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);
 
     @Autowired
-    private DocumentStorageService documentStorageService;
+    private StorageService storageService;
 
 
 
     @PostMapping("/documents")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public UploadDocumentResponse createDocument(@RequestParam("document") MultipartFile document) {
+    public DocumentResponse createDocument(@RequestParam("document") MultipartFile document) {
 
-        String documentName = documentStorageService.saveDocument(document);
+        String documentName = storageService.saveDocument(document);
 
         String documentDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/documents/")
                 .path(documentName)
                 .toUriString();
 
-        return new UploadDocumentResponse(documentName, documentDownloadUri,
+        return new DocumentResponse(documentName, documentDownloadUri,
                 document.getContentType(), document.getSize());
     }
 
     @PutMapping("/documents/{documentId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public UploadDocumentResponse updateDocument(@RequestParam("document") MultipartFile document,
-                                                       @PathVariable String documentId) {
+    public DocumentResponse updateDocument(@RequestParam("document") MultipartFile document,
+                                           @PathVariable String documentId) {
         // Load document as Resource
-        String updatedDocId = documentStorageService.updateDocument(documentId, document);
+        String updatedDocId = storageService.updateDocument(documentId, document);
 
         String documentDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/documents/")
                 .path(updatedDocId)
                 .toUriString();
 
-        return new UploadDocumentResponse(updatedDocId, documentDownloadUri,
+        return new DocumentResponse(updatedDocId, documentDownloadUri,
                 document.getContentType(), document.getSize());
     }
 
@@ -65,7 +65,7 @@ public class DocumentController {
     public void deleteDocument(@PathVariable String documentId) {
         try {
             // delete Document
-            documentStorageService.deleteDocument(documentId);
+            storageService.deleteDocument(documentId);
         } catch (Exception ex) {
             logger.info("Could not delete the document:"+documentId);
         }
@@ -74,7 +74,7 @@ public class DocumentController {
     @GetMapping("/documents/{documentId}")
     public ResponseEntity<Resource> getDocument(@PathVariable String documentId, HttpServletRequest request) {
         // Load document as Resource
-        Resource resource = documentStorageService.loadDocument(documentId);
+        Resource resource = storageService.loadDocument(documentId);
 
         // Try to determine document's content type
         String contentType = null;

@@ -1,12 +1,12 @@
 package com.company.codetest.documentapi.payload;
 
-public class UploadDocumentResponse {
+public class DocumentResponse {
     private String documentName;
     private String documentDownloadUri;
     private String documentType;
     private long size;
 
-    public UploadDocumentResponse(String documentName, String documentDownloadUri, String documentType, long size) {
+    public DocumentResponse(String documentName, String documentDownloadUri, String documentType, long size) {
         this.documentName = documentName;
         this.documentDownloadUri = documentDownloadUri;
         this.documentType = documentType;
