@@ -1,0 +1,28 @@
+# SERVER Properties
+server:
+  port: 9000
+
+## MULTIPART (MultipartProperties)
+spring:
+  servlet:
+    multipart:
+      enabled: true             # Enable multipart uploads
+      max-file-size: 200MB      # Max File Size
+      max-request-size: 215MB   # Max Request Size
+    file-size-threshold: 2KB    # Threshold after which files are written to disk.
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.H2Dialect
+      ddl-auto: create
+## File Storage Properties
+document.upload-dir: "./doc-storage"
+
