@@ -1,4 +1,4 @@
-package com.company.codetest.documentapi.property;
+package com.company.codetest.documentapi.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

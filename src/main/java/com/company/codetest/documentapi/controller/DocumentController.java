@@ -1,7 +1,9 @@
 package com.company.codetest.documentapi.controller;
 
 
-import com.company.codetest.documentapi.payload.DocumentResponse;
+import com.company.codetest.documentapi.dto.DocumentRequest;
+import com.company.codetest.documentapi.dto.DocumentResponse;
+import com.company.codetest.documentapi.exception.DocumentNotFoundException;
 import com.company.codetest.documentapi.service.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,45 +29,30 @@ public class DocumentController {
     @Autowired
     private StorageService storageService;
 
-
-
     @PostMapping("/documents")
     @ResponseStatus(value = HttpStatus.CREATED)
     public DocumentResponse createDocument(@RequestParam("document") MultipartFile document) {
-
-        String documentName = storageService.saveDocument(document);
-
-        String documentDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/documents/")
-                .path(documentName)
-                .toUriString();
-
-        return new DocumentResponse(documentName, documentDownloadUri,
-                document.getContentType(), document.getSize());
+        DocumentRequest documentRequest = new DocumentRequest(null, document);
+        return storageService.saveDocument(documentRequest);
     }
 
     @PutMapping("/documents/{documentId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public DocumentResponse updateDocument(@RequestParam("document") MultipartFile document,
                                            @PathVariable String documentId) {
+        DocumentRequest documentRequest = new DocumentRequest(documentId, document);
         // Load document as Resource
-        String updatedDocId = storageService.updateDocument(documentId, document);
+        return storageService.updateDocument(documentRequest);
 
-        String documentDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/documents/")
-                .path(updatedDocId)
-                .toUriString();
-
-        return new DocumentResponse(updatedDocId, documentDownloadUri,
-                document.getContentType(), document.getSize());
     }
 
     @DeleteMapping("/documents/{documentId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteDocument(@PathVariable String documentId) {
         try {
+            DocumentRequest documentRequest = new DocumentRequest(documentId, null);
             // delete Document
-            storageService.deleteDocument(documentId);
+            storageService.deleteDocument(documentRequest);
         } catch (Exception ex) {
             logger.info("Could not delete the document:"+documentId);
         }
@@ -73,15 +60,20 @@ public class DocumentController {
 
     @GetMapping("/documents/{documentId}")
     public ResponseEntity<Resource> getDocument(@PathVariable String documentId, HttpServletRequest request) {
+        //prepare request object
+        DocumentRequest documentRequest = new DocumentRequest(documentId, null);
         // Load document as Resource
-        Resource resource = storageService.loadDocument(documentId);
-
-        // Try to determine document's content type
         String contentType = null;
+        Resource resource = null;
         try {
+            resource = storageService.loadDocument(documentRequest);
+            // Try to determine document's content type
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
-            logger.info("Could not determine document type.");
+            logger.error("Could not determine content type.");
+        } catch (DocumentNotFoundException ex) {
+            logger.error("Could not determine document type.");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         // Fallback to the default content type if type could not be determined
@@ -94,4 +86,9 @@ public class DocumentController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
+
+/*    @ExceptionHandler(RuntimeException.class)
+    public final ResponseEntity<Exception> handleAllExceptions(RuntimeException ex) {
+        return new ResponseEntity<Exception>(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+    }*/
 }

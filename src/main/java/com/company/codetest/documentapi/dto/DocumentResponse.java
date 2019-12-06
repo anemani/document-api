@@ -1,24 +1,30 @@
-package com.company.codetest.documentapi.payload;
+package com.company.codetest.documentapi.dto;
 
 public class DocumentResponse {
-    private String documentName;
+    private String documentId;
     private String documentDownloadUri;
     private String documentType;
     private long size;
 
-    public DocumentResponse(String documentName, String documentDownloadUri, String documentType, long size) {
-        this.documentName = documentName;
+    public DocumentResponse(String documentId,
+                            String documentDownloadUri,
+                            String documentType,
+                            long size) {
+        this.documentId = documentId;
         this.documentDownloadUri = documentDownloadUri;
         this.documentType = documentType;
         this.size = size;
     }
 
-    public String getDocumentName() {
-        return documentName;
+    public DocumentResponse() {
     }
 
-    public void setDocumentName(String documentName) {
-        this.documentName = documentName;
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 
     public String getDocumentDownloadUri() {

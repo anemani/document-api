@@ -1,6 +1,7 @@
 package com.company.codetest.documentapi.domain;
 
 
+
 import javax.persistence.*;
 
 @Entity
