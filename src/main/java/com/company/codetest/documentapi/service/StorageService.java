@@ -1,12 +1,11 @@
 package com.company.codetest.documentapi.service;
 
-import com.company.codetest.documentapi.controller.DocumentController;
+import com.company.codetest.documentapi.config.DocumentStorageProperties;
 import com.company.codetest.documentapi.domain.DocumentMetaData;
 import com.company.codetest.documentapi.dto.DocumentRequest;
 import com.company.codetest.documentapi.dto.DocumentResponse;
 import com.company.codetest.documentapi.exception.DocumentNotFoundException;
 import com.company.codetest.documentapi.exception.DocumentStorageException;
-import com.company.codetest.documentapi.config.DocumentStorageProperties;
 import com.company.codetest.documentapi.repository.DocumentMetaDataRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

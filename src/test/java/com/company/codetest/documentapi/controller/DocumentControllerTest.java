@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class DocumentControllerTest {
 
-    Logger logger = LoggerFactory.getLogger(DocumentControllerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(DocumentControllerTest.class);
     private static String createDocumentUrl;
     private static String updateDocumentUrl;
     private static String getDocumentUrl;
@@ -71,7 +71,8 @@ class DocumentControllerTest {
         //2.Verify request succeed
         assertNotNull(documentResponse);
         assertEquals(HttpStatus.CREATED, documentResponse.getStatusCode());
-        assertTrue(documentResponse.getBody().getDocumentType().equalsIgnoreCase("application/txt"));
+        assertNotNull(documentResponse.getBody());
+        assertTrue("application/txt".equalsIgnoreCase(documentResponse.getBody().getDocumentType()));
         assertEquals(20L, documentResponse.getBody().getSize());
         logger.info("Document {} with contents: {} created",
                 documentResponse.getBody().getDocumentId(), documentResponse.getBody().getDocumentId());
@@ -84,11 +85,13 @@ class DocumentControllerTest {
                 = prepareRequestEntity(mockMultipartFile1);
         ResponseEntity<DocumentResponse> createDocumentResponse
                 = testRestTemplate.exchange(createDocumentUrl, HttpMethod.POST, reqEntity, DocumentResponse.class);
+        assertNotNull(createDocumentResponse.getBody());
         String documentId = createDocumentResponse.getBody().getDocumentId();
         //2. Verify the Document exists
         ResponseEntity<Resource> resourceResponseEntity
                 = testRestTemplate.getForEntity(getDocumentUrl+documentId, Resource.class);
         assertEquals(HttpStatus.OK, resourceResponseEntity.getStatusCode());
+        assertNotNull(resourceResponseEntity.getBody());
         assertEquals(FILE1_NAME, resourceResponseEntity.getBody().getFilename());
         assertEquals(FILE1_CONTENTS, readFileData(resourceResponseEntity));
         //3. update the same documentID with different document content
@@ -99,6 +102,7 @@ class DocumentControllerTest {
         //4. Verify if the Document update succeeded
         ResponseEntity<Resource> resourceResponseEntity2 = testRestTemplate.getForEntity(getDocumentUrl+documentId, Resource.class);
         assertEquals(HttpStatus.OK, resourceResponseEntity2.getStatusCode());
+        assertNotNull(resourceResponseEntity2.getBody());
         assertNotNull(resourceResponseEntity2.getBody().getFilename());
         assertEquals(FILE2_NAME, resourceResponseEntity2.getBody().getFilename());
         assertEquals(FILE2_CONTENTS, readFileData(resourceResponseEntity2));
@@ -109,11 +113,13 @@ class DocumentControllerTest {
         HttpEntity<LinkedMultiValueMap<String, Object>> reqEntity = prepareRequestEntity(mockMultipartFile1);
         ResponseEntity<DocumentResponse> documentResponse
                 = testRestTemplate.exchange(createDocumentUrl, HttpMethod.POST, reqEntity, DocumentResponse.class);
+        assertNotNull(documentResponse.getBody());
         String documentId = documentResponse.getBody().getDocumentId();
         ResponseEntity<Resource> resource = testRestTemplate.getForEntity(getDocumentUrl+documentId, Resource.class);
 
         //Verify request succeed
         assertEquals(HttpStatus.OK, resource.getStatusCode());
+        assertNotNull(resource.getBody());
         assertEquals(FILE1_NAME, resource.getBody().getFilename());
         assertEquals(FILE1_CONTENTS, readFileData(resource));
 
@@ -130,12 +136,14 @@ class DocumentControllerTest {
                 = prepareRequestEntity(mockMultipartFile1);
         ResponseEntity<DocumentResponse> documentResponse
                 = testRestTemplate.exchange(createDocumentUrl, HttpMethod.POST, reqEntity, DocumentResponse.class);
+        assertNotNull(documentResponse.getBody());
         String documentId = documentResponse.getBody().getDocumentId();
         assertNotNull(documentId);
         ResponseEntity<Resource> resource
                 = testRestTemplate.getForEntity(getDocumentUrl+documentId, Resource.class);
         //Verify request succeed
         assertEquals(HttpStatus.OK, resource.getStatusCode());
+        assertNotNull(resource.getBody());
         assertEquals(FILE1_NAME, resource.getBody().getFilename());
         assertEquals(FILE1_CONTENTS, readFileData(resource));
     }
@@ -146,18 +154,17 @@ class DocumentControllerTest {
         LinkedMultiValueMap<String, String> documentFileHeaderMap = new LinkedMultiValueMap<>();
         documentFileHeaderMap.add("Content-disposition", "form-data; name=document; filename=" + mockMultipartFile.getOriginalFilename());
         documentFileHeaderMap.add("Content-type", "application/txt");
-        HttpEntity<byte[]> doc = new HttpEntity<byte[]>(mockMultipartFile.getBytes(), documentFileHeaderMap);
+        HttpEntity<byte[]> doc = new HttpEntity<>(mockMultipartFile.getBytes(), documentFileHeaderMap);
 
         LinkedMultiValueMap<String, Object> multipartReqMap = new LinkedMultiValueMap<>();
         multipartReqMap.add("document", doc);
 
-        HttpEntity<LinkedMultiValueMap<String, Object>> reqEntity = new HttpEntity<>(multipartReqMap, headers);
-
-        return reqEntity;
+        return new HttpEntity<>(multipartReqMap, headers);
     }
     private String readFileData(ResponseEntity<Resource> resourceResponseEntity){
         StringBuilder result = new StringBuilder();
         try {
+            assertNotNull(resourceResponseEntity.getBody());
             BufferedReader reader
                     = new BufferedReader(new InputStreamReader(resourceResponseEntity.getBody().getInputStream()));
             String line;

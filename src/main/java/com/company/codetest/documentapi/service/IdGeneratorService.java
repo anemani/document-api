@@ -8,13 +8,14 @@ import java.util.Random;
 @Service
 class IdGeneratorService {
 
+    private static final int ID_LENGTH = 20;
     String generateRandomDocumentId() {
-        return getAlphaNumericString(20);
+        return getAlphaNumericString();
     }
 
-    private static String getAlphaNumericString(int n)
+    private static String getAlphaNumericString()
     {
-
+        int n = ID_LENGTH;
         // length is bounded by 256 Character
         byte[] array = new byte[256];
         new Random().nextBytes(array);
